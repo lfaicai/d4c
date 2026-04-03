@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.faicai.d4c.mapper.UserHistoryMapper">
+
+    <resultMap id="BaseResultMap" type="org.faicai.d4c.pojo.entity.UserHistory">
+        <id column="history_id" property="historyId"/>
+        <result column="history_title" property="historyTitle"/>
+        <result column="history_Type" property="historyType"/>
+        <result column="connect_id" property="connectId"/>
+        <result column="connect_name" property="connectName"/>
+        <result column="db_id" property="dbId"/>
+        <result column="db_name" property="dbName"/>
+        <result column="schema_id" property="schemaId"/>
+        <result column="schema_name" property="schemaName"/>
+        <result column="table_id" property="tableId"/>
+        <result column="table_name" property="tableName"/>
+        <result column="sql_content" property="sqlContent"/>
+        <result column="table_request_params" property="tableRequestParams"/>
+        <result column="table_select_tree_state" property="tableSelectTreeState"/>
+        <result column="table_hidden_fields" property="tableHiddenFields"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_by" property="updatedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="findCurrentHistory" resultType="org.faicai.d4c.pojo.entity.UserHistory">
+
+    </select>
+
+</mapper>

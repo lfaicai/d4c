@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.faicai.d4c.mapper.ResourceMapper">
+
+    <resultMap id="BaseResultMap" type="org.faicai.d4c.pojo.entity.Resource">
+        <id column="id" property="id"/>
+        <result column="database_connect_id" property="databaseConnectId"/>
+        <result column="resource_type" property="resourceType"/>
+        <result column="idx" property="idx"/>
+        <result column="database_name" property="databaseName"/>
+        <result column="schema_name" property="schemaName"/>
+        <result column="table_name" property="tableName"/>
+        <result column="column_name" property="columnName"/>
+        <result column="description" property="description"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_by" property="updatedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="deleted" property="deleted"/>
+        <result column="description_ai" property="descriptionAi"/>
+        <result column="data_type" property="dataType"/>
+    </resultMap>
+
+    <select id="resourcesList" resultType="org.faicai.d4c.pojo.entity.Resource">
+
+    </select>
+    <select id="findCurrentUserResources" resultType="org.faicai.d4c.pojo.entity.UserResource">
+        SELECT
+            r.resource_type ,
+            r.database_name ,
+            r.schema_name ,
+            r.table_name ,
+            r.column_name ,
+            p.can_select,
+            p.can_update,
+            p.can_delete,
+            p.can_insert,
+            p.can_drop,
+            p.can_merge,
+            p.can_create,
+            p.can_alter,
+            p.can_create_index,
+            p.can_drop_index,
+            p.can_referenced,
+            p.can_add,
+            p.can_add_partition,
+            p.can_analyze
+        FROM
+            uc_role ur
+        LEFT JOIN permission p on
+            ur.role_id = p.role_id and p.deleted = false
+        LEFT JOIN resource r on
+            r.id = p.resource_id and r.deleted = false
+        where
+            ur.deleted = false
+          and ur.uc_id = #{userId}
+          and r.database_connect_id  = #{databaseConnectId}
+    </select>
+    <select id="findCurrentUserResourcesByAction" resultType="org.faicai.d4c.pojo.entity.UserResource">
+        SELECT
+            r.resource_type ,
+            r.database_name ,
+            r.schema_name ,
+            r.table_name ,
+            r.column_name ,
+            p.can_select,
+            p.can_update,
+            p.can_delete,
+            p.can_insert,
+            p.can_drop,
+            p.can_merge,
+            p.can_create,
+            p.can_alter,
+            p.can_create_index,
+            p.can_drop_index,
+            p.can_referenced,
+            p.can_add,
+            p.can_add_partition,
+            p.can_analyze
+        FROM
+            uc_role ur
+            LEFT JOIN permission p on
+            ur.role_id = p.role_id and p.deleted = false
+            LEFT JOIN resource r on
+            r.id = p.resource_id and r.deleted = false
+        where
+            ur.deleted = false
+            and p.deleted = false
+            and ur.uc_id = #{userId}
+            and r.database_connect_id  = #{connectId}
+        <if test=" action == 'SELECT' ">
+           and p.can_select= true
+        </if>
+        <if test=" action == 'UPDATE' ">
+            and p.can_update= true
+        </if>
+        <if test=" action == 'DELETE' ">
+            and p.can_delete= true
+        </if>
+        <if test=" action == 'INSERT' ">
+            and p.can_insert= true
+        </if>
+        <if test=" action == 'DROP' ">
+            and p.can_drop= true
+        </if>
+        <if test=" action == 'MERGE' ">
+            and p.can_merge= true
+        </if>
+        <if test=" action == 'CREATE' ">
+            and p.can_create= true
+        </if>
+        <if test=" action == 'ALTER' ">
+            and p.can_alter= true
+        </if>
+        <if test=" action == 'CREATE_INDEX' ">
+            and p.can_create_index= true
+        </if>
+        <if test=" action == 'DROP_INDEX' ">
+            and p.can_drop_index= true
+        </if>
+        <if test=" action == 'REFERENCED' ">
+            and p.can_referenced= true
+        </if>
+        <if test=" action == 'ADD' ">
+            and p.can_add= true
+        </if>
+        <if test=" action == 'ADD_PARTITION' ">
+            and p.can_add_partition= true
+        </if>
+        <if test=" action == 'ANALYZE' ">
+            and p.can_analyze= true
+        </if>
+    </select>
+
+    <select id="findNodes" resultType="org.faicai.d4c.pojo.vo.ResourceNodeVO">
+        SELECT
+            r.id AS id,
+            r.database_connect_id AS connectId,
+            r.database_name as dbName,
+            r.schema_name as schemaName,
+            #{nodeName} as parentName,
+            <if test=" resourceType.name() == 'DATABASE' ">
+                r.database_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'SCHEMA' ">
+                r.schema_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'TABLE' ">
+                r.table_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'COLUMN' ">
+                r.column_name AS name,
+            </if>
+            r.resource_type AS type,
+            c.db_type AS dbType
+        FROM
+            resource r left join database_connect_config c on c.id = r.database_connect_id
+        WHERE
+            r.deleted = false and r.database_connect_id = #{connectId} AND r.resource_type =#{resourceType}
+            <if test=" resourceType.name() == 'SCHEMA' ">
+                AND r.database_name = #{nodeName}
+            </if>
+            <if test=" resourceType.name() == 'TABLE' ">
+                AND (r.database_name = #{nodeName} or r.schema_name = #{nodeName})
+            </if>
+            <if test=" resourceType.name() == 'COLUMN' ">
+                AND r.table_name = #{nodeName} AND r.column_name != '*'
+            </if>
+    </select>
+    <select id="findNodesByRoleId" resultType="org.faicai.d4c.pojo.vo.PermissionResourceNodeVO">
+        SELECT
+            r.id AS id,
+            #{nodeName} as parentName,
+            r.database_connect_id AS connectId,
+            r.database_name AS dbName,
+            r.schema_name AS schemaName,
+            r.table_name AS tableName,
+            <if test=" resourceType.name() == 'DATABASE' ">
+                r.database_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'SCHEMA' ">
+                r.schema_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'TABLE' ">
+                r.table_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'COLUMN' ">
+                r.column_name AS name,
+            </if>
+            r.resource_type AS type,
+            c.db_type AS dbType,
+            p.can_select,
+            p.can_update,
+            p.can_delete,
+            p.can_insert,
+            p.can_drop,
+            p.can_merge,
+            p.can_create,
+            p.can_alter,
+            p.can_create_index,
+            p.can_drop_index,
+            p.can_referenced,
+            p.can_add,
+            p.can_add_partition,
+            p.can_analyze,
+            p.allow
+        FROM
+            resource r
+            left join permission p on p.resource_id = r.id and p.role_id = #{roleId}
+            left join database_connect_config c on c.id = r.database_connect_id
+        WHERE
+            r.deleted = false AND r.resource_type =#{resourceType}  and r.database_connect_id = #{connectId}
+            <if test=" resourceType.name() == 'SCHEMA' ">
+                AND r.database_name = #{nodeName}
+            </if>
+            <if test=" resourceType.name() == 'TABLE' ">
+                <if test="databaseName != null and databaseName != ''  ">
+                    AND r.database_name = #{databaseName}
+                </if>
+                AND (r.database_name = #{nodeName} or r.schema_name = #{nodeName})
+            </if>
+            <if test=" resourceType.name() == 'COLUMN' ">
+                <if test="databaseName != null and databaseName != ''  ">
+                    AND r.database_name = #{databaseName}
+                </if>
+                <if test="schemaName != null and schemaName != ''  ">
+                    AND r.schema_name = #{schemaName}
+                </if>
+                AND r.table_name = #{nodeName} AND r.column_name != '*'
+            </if>
+    </select>
+    <select id="findCurrentUserNodes" resultType="org.faicai.d4c.pojo.vo.ResourceNodeVO">
+        SELECT
+            DISTINCT
+            r.id AS id,
+            r.database_connect_id AS connectId,
+            c.name AS connectName,
+            r.database_name as dbName,
+            r.schema_name as schemaName,
+            #{nodeName} as parentName,
+            <if test=" resourceType.name() == 'DATABASE' ">
+                r.database_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'SCHEMA' ">
+                r.schema_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'TABLE' ">
+                r.table_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'COLUMN' ">
+                r.column_name AS name,
+            </if>
+            r.resource_type AS type,
+            c.db_type AS dbType
+        FROM
+            uc_role ur
+            LEFT JOIN permission p ON ur.role_id = p.role_id
+            left join resource r on p.resource_id = r.id
+            left join database_connect_config c on c.id = r.database_connect_id
+        WHERE
+            r.deleted = false and p.deleted = false and ur.uc_id =#{userId} AND r.resource_type =#{resourceType}  and r.database_connect_id = #{connectId}
+            and p.can_select= true
+            <if test=" resourceType.name() == 'SCHEMA' ">
+                AND r.database_name = #{nodeName}
+            </if>
+            <if test=" resourceType.name() == 'TABLE' ">
+                AND (r.database_name = #{nodeName} or r.schema_name = #{nodeName})
+            </if>
+            <if test=" resourceType.name() == 'COLUMN' ">
+                AND r.table_name = #{nodeName} AND r.column_name != '*'
+            </if>
+    </select>
+    <select id="findNodesAndDbName" resultType="org.faicai.d4c.pojo.vo.ResourceNodeVO">
+        SELECT DISTINCT
+            r.id AS id,
+            r.database_connect_id AS connectId,
+            r.database_name as dbName,
+            r.schema_name as schemaName,
+            #{nodeName} as parentName,
+            <if test=" resourceType.name() == 'DATABASE' ">
+                r.database_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'SCHEMA' ">
+                r.schema_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'TABLE' ">
+                r.table_name AS name,
+            </if>
+            <if test=" resourceType.name() == 'COLUMN' ">
+                r.column_name AS name,
+            </if>
+            r.resource_type AS type,
+            c.db_type AS dbType
+        FROM
+            resource r left join database_connect_config c on c.id = r.database_connect_id
+        WHERE
+            r.deleted = false and r.database_connect_id = #{connectId} AND r.resource_type =#{resourceType}
+            <if test=" dbName != null">
+                AND r.database_name = #{dbName}
+            </if>
+            <if test=" resourceType.name() == 'SCHEMA' ">
+                AND r.database_name = #{nodeName}
+            </if>
+            <if test=" resourceType.name() == 'TABLE' ">
+                AND (r.database_name = #{nodeName} or r.schema_name = #{nodeName})
+            </if>
+            <if test=" resourceType.name() == 'COLUMN' ">
+                AND r.table_name = #{nodeName} AND r.column_name != '*'
+            </if>
+    </select>
+    <select id="findNodeById" resultType="org.faicai.d4c.pojo.vo.ResourceNodeVO">
+        select
+            DISTINCT
+            r.id,
+            r.database_connect_id as connectId,
+            r.resource_type AS type,
+            c.name as connectName,
+            r.database_name as dbName,
+            r.schema_name as schemaName,
+            c.db_type AS dbType,
+            case
+                when resource_type = 'CONNECTION' then c.name
+                when resource_type = 'DATABASE' then r.database_name
+                when resource_type = 'SCHEMA' then r.schema_name
+                when resource_type = 'TABLE' then r.table_name
+                when resource_type = 'COLUMN' then r.column_name
+                else null
+            end as name
+        from
+            uc_role ur
+            left join permission p on ur.role_id = p.role_id
+            left join resource r on p.resource_id = r.id
+            left join database_connect_config c on c.id = r.database_connect_id
+        WHERE r.deleted = false and p.deleted = false and ur.uc_id =#{userId} AND r.id = #{id}
+    </select>
+
+    <select id="findLowerLevelNodeIds" resultType="java.lang.Long">
+        <choose>
+            <when test="resourceType.name() == 'CONNECTION'">
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                where r1.id = #{id}
+                and r2.deleted = false
+                and r2.resource_type in ('DATABASE', 'SCHEMA', 'TABLE', 'COLUMN')
+
+                union all
+
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                where r2.id = #{id}
+                and r1.id != #{id}
+                and r2.deleted = false
+                and r2.resource_type in ('DATABASE', 'SCHEMA', 'TABLE', 'COLUMN')
+            </when>
+
+            <when test="resourceType.name() == 'DATABASE'">
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                where r1.id = #{id}
+                and r2.deleted = false
+                and r2.resource_type in ('SCHEMA', 'TABLE', 'COLUMN')
+                and r2.database_name = r1.database_name
+                union all
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                where r2.id = #{id}
+                and r1.id != #{id}
+                and r2.deleted = false
+                and r2.resource_type in ('SCHEMA', 'TABLE', 'COLUMN')
+                and r2.database_name = r1.database_name
+            </when>
+
+            <when test="resourceType.name() == 'SCHEMA'">
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                where r1.id = #{id}
+                and r2.deleted = false
+                and r2.resource_type in ('TABLE', 'COLUMN')
+                and r2.database_name = r1.database_name
+                and (r2.schema_name IS NOT DISTINCT FROM r1.schema_name)
+                union all
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                where r2.id = #{id}
+                and r1.id != #{id}
+                and r2.deleted = false
+                and r2.resource_type in ('TABLE', 'COLUMN')
+                and r2.database_name = r1.database_name
+                and (r2.schema_name IS NOT DISTINCT FROM r1.schema_name)
+            </when>
+
+            <when test="resourceType.name() == 'TABLE'">
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                where r1.id = #{id}
+                and r2.deleted = false
+                and r2.resource_type = 'COLUMN'
+                and r2.database_name = r1.database_name
+                and (r2.schema_name IS NOT DISTINCT FROM r1.schema_name)
+                and r2.table_name = r1.table_name
+
+                union all
+
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                where r2.id = #{id}
+                and r1.id != #{id}
+                and r2.deleted = false
+                and r2.resource_type = 'COLUMN'
+                and r2.database_name = r1.database_name
+                and (r2.schema_name IS NOT DISTINCT FROM r1.schema_name)
+                and r2.table_name = r1.table_name
+            </when>
+        </choose>
+    </select>
+
+    <select id="findConnectionNodesByRoleId" resultType="org.faicai.d4c.pojo.vo.PermissionResourceNodeVO">
+        SELECT
+            r.database_connect_id AS id,
+            r.database_connect_id AS connectId,
+            dcc.name,
+            dcc.db_type,
+            r.resource_type AS type,
+            COALESCE(p.can_select, false) as can_select,
+            COALESCE(p.can_update, false) as can_update,
+            COALESCE(p.can_delete, false) as can_delete,
+            COALESCE(p.can_insert, false) as can_insert,
+            COALESCE(p.can_drop, false) as can_drop,
+            COALESCE(p.can_merge, false) as can_merge,
+            COALESCE(p.can_create, false) as can_create,
+            COALESCE(p.can_alter, false) as can_alter,
+            COALESCE(p.can_create_index, false) as can_create_index,
+            COALESCE(p.can_drop_index, false) as can_drop_index,
+            COALESCE(p.can_referenced, false) as can_referenced,
+            COALESCE(p.can_add, false) as can_add,
+            COALESCE(p.can_add_partition, false) as can_add_partition,
+            COALESCE(p.can_analyze, false) as can_analyze,
+            COALESCE(p.allow, false) as allow
+        FROM
+            resource r
+                LEFT JOIN  permission p on p.resource_id = r.id and p.role_id = #{roleId} and p.deleted = false
+                LEFT JOIN database_connect_config dcc on r.database_connect_id  = dcc.id
+        WHERE
+            r.deleted = false AND r.resource_type = #{resourceType}
+    </select>
+    <select id="findUpperLevelNodeIds" resultType="java.lang.Long">
+        <choose>
+            <when test="resourceType.name() == 'DATABASE'">
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                and r2.deleted = false
+                and r2.resource_type = 'CONNECTION'
+                where r1.id = #{id}
+            </when>
+            <when test="resourceType.name() == 'SCHEMA'">
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                and r2.deleted = false
+                and r2.resource_type = 'CONNECTION'
+                where r1.id = #{id}
+
+                union all
+
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                and r2.deleted = false
+                and r2.resource_type = 'DATABASE'
+                and r2.database_name = r1.database_name
+                where r1.id = #{id}
+            </when>
+            <when test="resourceType.name() == 'TABLE'">
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                and r2.deleted = false
+                and r2.resource_type = 'CONNECTION'
+                where r1.id = #{id}
+
+                union all
+
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                and r2.deleted = false
+                and r2.resource_type = 'DATABASE'
+                and r2.database_name = r1.database_name
+                where r1.id = #{id}
+
+                union all
+
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                and r2.deleted = false
+                and r2.resource_type = 'SCHEMA'
+                and r2.database_name = r1.database_name
+                and (r2.schema_name IS NOT DISTINCT FROM r1.schema_name)
+                where r1.id = #{id}
+            </when>
+            <when test="resourceType.name() == 'COLUMN'">
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                and r2.deleted = false
+                and r2.resource_type = 'CONNECTION'
+                where r1.id = #{id}
+
+                union all
+
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                and r2.deleted = false
+                and r2.resource_type = 'DATABASE'
+                and r2.database_name = r1.database_name
+                where r1.id = #{id}
+
+                union all
+
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                and r2.deleted = false
+                and r2.resource_type = 'SCHEMA'
+                and r2.database_name = r1.database_name
+                and (r2.schema_name IS NOT DISTINCT FROM r1.schema_name)
+                where r1.id = #{id}
+
+                union all
+
+                select r2.id
+                from resource r1
+                inner join resource r2 on r2.database_connect_id = r1.database_connect_id
+                and r2.deleted = false
+                and r2.resource_type = 'TABLE'
+                and r2.database_name = r1.database_name
+                and (r2.schema_name IS NOT DISTINCT FROM r1.schema_name)
+                and r2.table_name = r1.table_name
+                where r1.id = #{id}
+            </when>
+        </choose>
+    </select>
+    <select id="findNodesByUserIdAndConnectId" resultType="org.faicai.d4c.pojo.vo.ResourceNodeVO">
+        SELECT
+            DISTINCT
+            r.id AS id,
+            r.database_connect_id AS connectId,
+            c.name AS connectName,
+            r.database_name as dbName,
+            r.schema_name as schemaName,
+            CASE
+                WHEN r.resource_type = 'DATABASE' THEN r.database_name
+                WHEN r.resource_type = 'SCHEMA' THEN r.schema_name
+                WHEN r.resource_type = 'TABLE' THEN r.table_name
+                WHEN r.resource_type = 'COLUMN' THEN  r.column_name
+            END AS name,
+            CASE
+                WHEN r.resource_type = 'DATABASE' THEN  c.name
+                WHEN r.resource_type = 'SCHEMA' THEN r.database_name
+                WHEN r.resource_type = 'SCHEMA' THEN NULLIF(r.schema_name, r.database_name)
+                WHEN r.resource_type = 'COLUMN' THEN  r.table_name
+            END AS parentName,
+            r.resource_type AS type,
+            c.db_type AS dbType
+        FROM
+            uc_role ur
+            LEFT JOIN permission p ON ur.role_id = p.role_id
+            left join resource r on p.resource_id = r.id
+            left join database_connect_config c on c.id = r.database_connect_id
+        WHERE
+            r.deleted = false
+            and p.deleted = false
+            and ur.uc_id =#{userId}
+            and r.database_connect_id = #{connectId}
+            and p.can_select= true and r.resource_type != 'CONNECTION'
+    </select>
+    <select id="findAllColumnByTableNamesAndConnectIdAndUserId" resultType="org.faicai.d4c.pojo.vo.ColumnVO">
+        SELECT
+            r.column_name AS name,
+            r.table_name AS tableName,
+            r.data_type AS type,
+            r.description_ai AS description
+        FROM
+            uc_role ur
+                LEFT JOIN permission p ON
+                ur.role_id = p.role_id
+                LEFT JOIN resource r ON
+                p.resource_id = r.id
+                LEFT JOIN database_connect_config dcc on r.database_connect_id  = dcc.id
+        WHERE
+            r.deleted = false and p.deleted = false
+            AND r.database_connect_id = #{connectId}
+            AND ur.uc_id = #{userId} AND r.resource_type  = 'COLUMN'
+        <if test="tableNames  != null and tableNames.size() > 0">
+            <foreach collection="tableNames" item="tableName" open=" AND r.table_name in(" separator="," close=")">
+                #{tableName}
+            </foreach>
+        </if>
+    </select>
+
+</mapper>

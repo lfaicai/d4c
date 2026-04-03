@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.faicai.d4c.mapper.D4cUserMapper">
+
+    <resultMap id="BaseResultMap" type="org.faicai.d4c.pojo.entity.D4cUser">
+        <id column="id" property="id"/>
+        <result column="provider" property="provider"/>
+        <result column="external_id" property="externalId"/>
+        <result column="username" property="username"/>
+        <result column="account" property="account"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="status" property="status"/>
+        <result column="icon_url" property="iconUrl"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_by" property="updatedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+    <sql id="userVO_sql">
+        select id, provider, external_id, username, account, password, email, status, icon_url from d4c_user
+    </sql>
+
+    <select id="selectPageVo" resultType="org.faicai.d4c.pojo.vo.UserVO">
+        <include refid="userVO_sql" /> ${ew.customSqlSegment}
+<!--        <if test="dto.username != null and dto.username != ''">-->
+<!--            and username LIKE CONCAT('%', #{dto.username},'%')-->
+<!--        </if>-->
+<!--        <if test="dto.account != null and dto.account != ''">-->
+<!--            and `account` LIKE CONCAT('%', #{dto.account},'%')-->
+<!--        </if>-->
+<!--        <if test="dto.status != null">-->
+<!--            and `status` = #{dto.status}-->
+<!--        </if>-->
+<!--        <if test="dto.ids != null and dto.ids.size > 0">-->
+<!--            <foreach collection="dto.ids" item="id" open=" and id in (" close=")" separator=",">-->
+<!--                #{id}-->
+<!--            </foreach>-->
+<!--        </if>-->
+    </select>
+
+</mapper>

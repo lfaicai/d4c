@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.faicai.d4c.mapper.UcRoleMapper">
+
+    <resultMap id="BaseResultMap" type="org.faicai.d4c.pojo.entity.UcRole">
+        <result column="uc_id" property="ucId"/>
+        <result column="role_id" property="roleId"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_by" property="updatedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+</mapper>

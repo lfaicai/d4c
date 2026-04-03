@@ -1,0 +1,1 @@
+import{V as o}from"./VApp-DUU8VlGL.js";import{a as t,w as r,b as a,d as n,e as p}from"./index-DNu25Nng.js";import"./resizeObserver-qmGcB_jb.js";import"./layout-BMf22ssr.js";const f={__name:"blank",setup(s){return(_,c)=>{const e=a("router-view");return n(),t(o,null,{default:r(()=>[p(e)]),_:1})}}};export{f as default};

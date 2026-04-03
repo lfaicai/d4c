@@ -1,0 +1,1 @@
+import{b as o}from"./route-block-B_A1xBdJ.js";import{b as t,a as r,d as n}from"./index-DNu25Nng.js";const a={__name:"admin",setup(c){return(s,_)=>{const e=t("router-view");return n(),r(e)}}};typeof o=="function"&&o(a);export{a as default};

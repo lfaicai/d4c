@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.faicai.d4c.mapper.PermissionMapper">
+
+    <resultMap id="BaseResultMap" type="org.faicai.d4c.pojo.entity.Permission">
+        <id column="id" property="id"/>
+        <result column="role_id" property="roleId"/>
+        <result column="resource_id" property="resourceId"/>
+        <result column="can_select" property="canSelect"/>
+        <result column="can_update" property="canUpdate"/>
+        <result column="can_delete" property="canDelete"/>
+        <result column="can_insert" property="canInsert"/>
+        <result column="can_drop" property="canDrop"/>
+        <result column="can_merge" property="canMerge"/>
+        <result column="can_create" property="canCreate"/>
+        <result column="can_alter" property="canAlter"/>
+        <result column="can_create_index" property="canCreateIndex"/>
+        <result column="can_drop_index" property="canDropIndex"/>
+        <result column="can_referenced" property="canReferenced"/>
+        <result column="can_add" property="canAdd"/>
+        <result column="can_add_partition" property="canAddPartition"/>
+        <result column="can_analyze" property="canAnalyze"/>
+        <result column="allow" property="allow"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_by" property="updatedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+    <select id="findSelectTableIdsByUserIdAndTableIds" resultType="java.lang.Long">
+        select p.resource_id from uc_role ur left join "permission" p on ur.role_id = p.role_id where ur.uc_id = #{userId}
+        <if test=" tableIds != null and tableIds.size() > 0">
+            <foreach collection="tableIds" item="tableId" open=" and  p.resource_id in (" separator="," close=")">
+                #{tableId}
+            </foreach>
+        </if>
+    </select>
+
+</mapper>

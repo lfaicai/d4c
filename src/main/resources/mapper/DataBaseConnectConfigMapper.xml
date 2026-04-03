@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.faicai.d4c.mapper.DataBaseConnectConfigMapper">
+
+    <resultMap id="BaseResultMap" type="org.faicai.d4c.pojo.entity.DataBaseConnectConfig">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="userName" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="port" property="port"/>
+        <result column="host" property="host"/>
+        <result column="database_name" property="databaseName"/>
+        <result column="schema_name" property="schemaName"/>
+        <result column="max_connections" property="maxConnections"/>
+        <result column="db_type" property="dbType"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_by" property="updatedBy"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+</mapper>

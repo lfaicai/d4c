@@ -1,0 +1,1 @@
+import{a7 as a,s as n,v as r}from"./index-DNu25Nng.js";async function s(e){return a("/admin/uc/register",e)}async function t(e){return a("/admin/uc/pageQuery",e)}async function c(e){return n(`/admin/uc/${e}`)}async function i(e){return r("/admin/uc/update",e)}export{c as d,t as p,s as r,i as u};
